@@ -8,8 +8,17 @@ const HybridScraper = require('./services/hybrid_scraper');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 生成实例 ID
+const INSTANCE_ID = process.env.INSTANCE_ID || `instance-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
 // 中间件
 app.use(express.json({ limit: '50mb' }));
+
+// 请求日志中间件
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
 
 // 初始化服务
 const firecrawl = new FirecrawlService(process.env.FIRECRAWL_API_KEY);
@@ -24,13 +33,18 @@ const hybridScraper = new HybridScraper({
   selfHostedFirecrawlUrl: process.env.SELF_HOSTED_FIRECRAWL_URL
 });
 
+// 将实例 ID 传递给环境
+process.env.INSTANCE_ID = INSTANCE_ID;
+
 // 健康检查
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    service: 'opencode-agent',
+    service: 'opencode-agent-container',
     timestamp: new Date().toISOString(),
     container: true,
+    level: 'container',
+    instanceId: process.env.INSTANCE_ID || 'unknown',
     services: {
       firecrawl: !!process.env.FIRECRAWL_API_KEY,
       telegram: !!process.env.TELEGRAM_BOT_TOKEN,
@@ -45,6 +59,8 @@ app.get('/', (req, res) => {
   res.json({
     message: 'OpenCode Agent Container',
     version: '1.0.0',
+    status: 'online',
+    level: 'container',
     endpoints: {
       health: '/health',
       collect: '/api/collect',
@@ -315,28 +331,80 @@ app.post('/api/pipeline', async (req, res) => {
 
 // 404 处理
 app.use((req, res) => {
+  console.log(`[404] ${req.method} ${req.path} 未找到`);
   res.status(404).json({
     error: 'Not Found',
-    path: req.path
+    path: req.path,
+    availableEndpoints: ['/', '/health', '/api/collect', '/api/deduplicate', '/api/edit', '/api/pipeline']
   });
 });
 
 // 错误处理
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
+  console.error(`[Error] ${err.message}`);
+  console.error(err.stack);
   res.status(500).json({
     error: 'Internal Server Error',
-    message: err.message
+    message: err.message,
+    timestamp: new Date().toISOString()
   });
 });
 
+// 启动前的健康检查
+function performStartupChecks() {
+  const checks = {
+    'FIRECRAWL_API_KEY': !!process.env.FIRECRAWL_API_KEY,
+    'OPENROUTER_API_KEY': !!process.env.OPENROUTER_API_KEY,
+    'CF_API_KEY': !!process.env.CF_API_KEY,
+    'CF_ACCOUNT_ID': !!process.env.CF_ACCOUNT_ID,
+  };
+  
+  console.log('[Startup] ==================== 启动检查 ====================');
+  let allOk = true;
+  for (const [key, status] of Object.entries(checks)) {
+    const icon = status ? '✓' : '✗';
+    console.log(`[Startup] ${icon} ${key}: ${status ? '已配置' : '⚠️  缺失'}`);
+    if (!status && ['FIRECRAWL_API_KEY', 'OPENROUTER_API_KEY'].includes(key)) {
+      allOk = false;
+    }
+  }
+  console.log('[Startup] ================================================');
+  
+  if (!allOk) {
+    console.warn('[Startup] ⚠️  警告: 某些关键 API Key 未配置，部分功能可能不可用');
+  }
+  
+  return checks;
+}
+
 // 启动服务器
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`OpenCode Agent Container listening on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log('Services initialized:');
-  console.log(`  - Firecrawl: ${!!process.env.FIRECRAWL_API_KEY}`);
-  console.log(`  - Telegram: ${!!process.env.TELEGRAM_BOT_TOKEN}`);
-  console.log(`  - Cloudflare AI: ${!!process.env.CF_API_KEY}`);
-  console.log(`  - OpenRouter: ${!!process.env.OPENROUTER_API_KEY}`);
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[Server] 🚀 OpenCode Agent Container 启动成功`);
+  console.log(`[Server] 监听端口: ${PORT}`);
+  console.log(`[Server] 环境: ${process.env.NODE_ENV || 'development'}`);
+  
+  const checks = performStartupChecks();
+  
+  console.log('[Server] 已初始化的服务:');
+  console.log(`  - Firecrawl: ${checks.FIRECRAWL_API_KEY ? '✓' : '✗'}`);
+  console.log(`  - OpenRouter: ${checks.OPENROUTER_API_KEY ? '✓' : '✗'}`);
+  console.log(`  - Cloudflare: ${checks.CF_API_KEY ? '✓' : '✗'}`);
+  console.log('[Server] 容器已就绪，等待请求...');
+});
+
+// 优雅关闭
+process.on('SIGTERM', () => {
+  console.log('[Server] 收到 SIGTERM 信号，开始优雅关闭...');
+  server.close(() => {
+    console.log('[Server] 服务器已关闭');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('[Server] 收到 SIGINT 信号，开始优雅关闭...');
+  server.close(() => {
+    console.log('[Server] 服务器已关闭');
+    process.exit(0);
+  });
 });
