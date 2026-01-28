@@ -3,6 +3,7 @@ const FirecrawlService = require('./services/firecrawl');
 const { RSSService, TelegramService } = require('./services/rss');
 const DeduplicatorService = require('./services/deduplicator');
 const EditorService = require('./services/editor');
+const HybridScraper = require('./services/hybrid_scraper');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +17,12 @@ const rss = new RSSService();
 const telegram = process.env.TELEGRAM_BOT_TOKEN ? new TelegramService(process.env.TELEGRAM_BOT_TOKEN) : null;
 const deduplicator = new DeduplicatorService(process.env.CF_ACCOUNT_ID, process.env.CF_API_KEY);
 const editor = new EditorService(process.env.OPENROUTER_API_KEY);
+const hybridScraper = new HybridScraper({
+  firecrawlService: firecrawl,
+  rssService: rss,
+  rssBridgeUrl: process.env.RSS_BRIDGE_URL,
+  selfHostedFirecrawlUrl: process.env.SELF_HOSTED_FIRECRAWL_URL
+});
 
 // 健康检查
 app.get('/health', (req, res) => {
@@ -67,8 +74,8 @@ app.post('/api/collect', async (req, res) => {
       let result;
       
       if (type === 'firecrawl' || (type === 'auto' && source.startsWith('http'))) {
-        // Firecrawl 抓取
-        result = await firecrawl.smartScrape(source, {
+        // 混合抓取逻辑
+        result = await hybridScraper.smartScrape(source, {
           maxArticles: 30
         });
       } else if (type === 'rss' || (type === 'auto' && source.includes('rss'))) {
