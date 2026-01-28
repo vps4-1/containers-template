@@ -1,0 +1,19 @@
+# Firecrawl 抓取站点列表
+# 每行一个域名，支持注释
+
+# AI 公司官方博客
+openai.com
+anthropic.com
+deepmind.google
+huggingface.co
+cohere.com
+
+# 研究机构
+arxiv.org
+mit.edu
+stanford.edu
+
+# 科技媒体
+techcrunch.com
+wired.com
+theverge.com

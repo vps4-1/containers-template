@@ -1,0 +1,62 @@
+[
+  {
+    "name": "OpenAI Blog",
+    "url": "https://openai.com/blog/rss.xml",
+    "category": "official",
+    "priority": "high"
+  },
+  {
+    "name": "Anthropic News",
+    "url": "https://www.anthropic.com/news/rss.xml",
+    "category": "official",
+    "priority": "high"
+  },
+  {
+    "name": "Google AI Blog",
+    "url": "https://ai.googleblog.com/feeds/posts/default",
+    "category": "official",
+    "priority": "high"
+  },
+  {
+    "name": "DeepMind Blog",
+    "url": "https://deepmind.google/blog/rss.xml",
+    "category": "official",
+    "priority": "high"
+  },
+  {
+    "name": "HuggingFace Blog",
+    "url": "https://huggingface.co/blog/feed.xml",
+    "category": "official",
+    "priority": "high"
+  },
+  {
+    "name": "TechCrunch AI",
+    "url": "https://techcrunch.com/tag/artificial-intelligence/feed/",
+    "category": "news",
+    "priority": "normal"
+  },
+  {
+    "name": "The Verge AI",
+    "url": "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
+    "category": "news",
+    "priority": "normal"
+  },
+  {
+    "name": "Wired AI",
+    "url": "https://www.wired.com/feed/tag/ai/latest/rss",
+    "category": "news",
+    "priority": "normal"
+  },
+  {
+    "name": "MIT Technology Review AI",
+    "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+    "category": "research",
+    "priority": "high"
+  },
+  {
+    "name": "arXiv CS.AI",
+    "url": "http://export.arxiv.org/rss/cs.AI",
+    "category": "research",
+    "priority": "normal"
+  }
+]

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "server": {
+    "port": 3000,
+    "hostname": "0.0.0.0"
+  },
+  "autoupdate": false,
+  "autoshare": true,
+  "permission": {
+    "*": "allow",
+    "lsp": "deny",
+    "question": "deny"
+  },
+  "enabled_providers": ["openrouter-api", "cloudflare-ai"],
+  "default_agent": "collector",
+  "model": "{env:OPENROUTER_MODEL}",
+  "small_model": "x-ai/grok-2-1212",
+  
+  "mcp": {
+    "firecrawl": {
+      "type": "remote",
+      "url": "https://mcp.firecrawl.dev/{env:FIRECRAWL_API_KEY}/v2/mcp"
+    }
+  },
+  
+  "agent": {
+    "collector": {
+      "mode": "primary",
+      "permission": "allow",
+      "prompt": "你是数据收集专家，负责从 Firecrawl、RSS、Telegram 等多源统一收集内容。参考 agent/collector.md 的详细指南。"
+    },
+    "deduplicator": {
+      "mode": "subagent",
+      "permission": "allow",
+      "model": "x-ai/grok-2-1212",
+      "prompt": "你是语义去重专家，负责识别和过滤语义相似的重复内容。参考 agent/deduplicator.md 的详细指南。"
+    },
+    "editor": {
+      "mode": "subagent",
+      "permission": "allow",
+      "model": "anthropic/claude-3-5-haiku",
+      "prompt": "你是内容编辑专家，负责生成高质量的双语摘要和标签。参考 agent/editor.md 的详细指南。"
+    }
+  },
+  
+  "provider": {
+    "openrouter-api": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "OpenRouter",
+      "options": {
+        "baseURL": "https://openrouter.ai/api/v1",
+        "apiKey": "{env:OPENROUTER_API_KEY}"
+      },
+      "models": {
+        "x-ai/grok-2-1212": {
+          "name": "Grok 2 1212",
+          "limit": { "context": 128000, "output": 32000 }
+        },
+        "anthropic/claude-3-5-haiku": {
+          "name": "Claude 3.5 Haiku",
+          "limit": { "context": 200000, "output": 8000 }
+        },
+        "groq/llama-3.1-70b-versatile": {
+          "name": "Llama 3.1 70B",
+          "limit": { "context": 128000, "output": 32000 }
+        }
+      }
+    },
+    "cloudflare-ai": {
+      "npm": "@ai-sdk/cloudflare-workers-ai",
+      "name": "Cloudflare AI",
+      "options": {
+        "accountId": "{env:CF_ACCOUNT_ID}",
+        "apiKey": "{env:CF_API_KEY}"
+      },
+      "models": {
+        "@cf/baai/bge-base-en-v1.5": {
+          "name": "BGE Base EN v1.5 (Embedding)",
+          "limit": { "context": 512, "output": 768 }
+        }
+      }
+    }
+  }
+}

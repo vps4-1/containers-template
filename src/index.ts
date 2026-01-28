@@ -1,70 +1,96 @@
-import { Container, getContainer, getRandom } from "@cloudflare/containers";
+import { Container, getContainer } from "@cloudflare/containers";
 import { Hono } from "hono";
 
-export class MyContainer extends Container<Env> {
-	// Port the container listens on (default: 8080)
-	defaultPort = 8080;
-	// Time before container sleeps due to inactivity (default: 30s)
-	sleepAfter = "2m";
-	// Environment variables passed to the container
+export class OpenCodeAgentContainer extends Container<Env> {
+	// Container 监听端口
+	defaultPort = 3000;
+	// 10分钟无活动后休眠
+	sleepAfter = "10m";
+	// 环境变量
 	envVars = {
-		MESSAGE: "I was passed in via the container class!",
+		NODE_ENV: "production",
+		FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY || "",
+		OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || "",
+		CF_API_KEY: process.env.CF_API_KEY || "",
 	};
 
-	// Optional lifecycle hooks
+	// 生命周期钩子
 	override onStart() {
-		console.log("Container successfully started");
+		console.log("[OpenCode Agent] Container started successfully");
 	}
 
 	override onStop() {
-		console.log("Container successfully shut down");
+		console.log("[OpenCode Agent] Container stopped");
 	}
 
 	override onError(error: unknown) {
-		console.log("Container error:", error);
+		console.error("[OpenCode Agent] Container error:", error);
 	}
 }
 
-// Create Hono app with proper typing for Cloudflare Workers
+// 创建 Hono 应用
 const app = new Hono<{
 	Bindings: Env;
 }>();
 
-// Home route with available endpoints
+// 根路径
 app.get("/", (c) => {
-	return c.text(
-		"Available endpoints:\n" +
-			"GET /container/<ID> - Start a container for each ID with a 2m timeout\n" +
-			"GET /lb - Load balance requests over multiple containers\n" +
-			"GET /error - Start a container that errors (demonstrates error handling)\n" +
-			"GET /singleton - Get a single specific container instance",
-	);
+	return c.json({
+		service: "OpenCode Agent",
+		version: "1.0.0",
+		endpoints: {
+			health: "/health",
+			collect: "POST /api/collect",
+			deduplicate: "POST /api/deduplicate",
+			edit: "POST /api/edit",
+		},
+	});
 });
 
-// Route requests to a specific container using the container ID
-app.get("/container/:id", async (c) => {
-	const id = c.req.param("id");
-	const containerId = c.env.MY_CONTAINER.idFromName(`/container/${id}`);
-	const container = c.env.MY_CONTAINER.get(containerId);
-	return await container.fetch(c.req.raw);
+// 健康检查
+app.get("/health", (c) => {
+	return c.json({
+		status: "healthy",
+		service: "opencode-agent",
+		timestamp: new Date().toISOString(),
+		container: true,
+	});
 });
 
-// Demonstrate error handling - this route forces a panic in the container
-app.get("/error", async (c) => {
-	const container = getContainer(c.env.MY_CONTAINER, "error-test");
-	return await container.fetch(c.req.raw);
+// 所有 API 请求路由到 Container
+app.all("/api/*", async (c) => {
+	try {
+		// 使用单例模式获取 Container 实例
+		const container = getContainer(c.env.OPENCODE_AGENT);
+		
+		// 转发请求到 Container
+		return await container.fetch(c.req.raw);
+	} catch (error) {
+		console.error("[OpenCode Agent] Error routing to container:", error);
+		
+		return c.json({
+			error: "Container error",
+			message: error instanceof Error ? error.message : "Unknown error",
+			timestamp: new Date().toISOString(),
+		}, 500);
+	}
 });
 
-// Load balance requests across multiple containers
-app.get("/lb", async (c) => {
-	const container = await getRandom(c.env.MY_CONTAINER, 3);
-	return await container.fetch(c.req.raw);
+// 404 处理
+app.notFound((c) => {
+	return c.json({
+		error: "Not Found",
+		path: c.req.path,
+	}, 404);
 });
 
-// Get a single container instance (singleton pattern)
-app.get("/singleton", async (c) => {
-	const container = getContainer(c.env.MY_CONTAINER);
-	return await container.fetch(c.req.raw);
+// 错误处理
+app.onError((err, c) => {
+	console.error("[OpenCode Agent] Worker error:", err);
+	return c.json({
+		error: "Internal Server Error",
+		message: err.message,
+	}, 500);
 });
 
 export default app;

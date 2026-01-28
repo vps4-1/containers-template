@@ -1,24 +1,26 @@
 # syntax=docker/dockerfile:1
+FROM node:22-alpine AS build
 
-FROM golang:1.24-alpine AS build
-
-# Set destination for COPY
 WORKDIR /app
 
-# Download any Go modules
-COPY container_src/go.mod ./
-RUN go mod download
+# 复制 package.json
+COPY container_src/package.json ./
 
-# Copy container source code
-COPY container_src/*.go ./
+# 安装依赖
+RUN npm install --production
 
-# Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /server
+# 复制应用代码
+COPY container_src/ ./
 
-FROM scratch
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=build /server /server
-EXPOSE 8080
+# 生产环境
+FROM node:22-alpine
 
-# Run
-CMD ["/server"]
+WORKDIR /app
+
+COPY --from=build /app /app
+
+EXPOSE 3000
+
+ENV NODE_ENV=production
+
+CMD ["node", "server.js"]
