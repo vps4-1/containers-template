@@ -1,0 +1,12 @@
+name = "opencode-agent"
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+account_id = "e02472b1ddaf02be3ae518747eac5e83"
+
+[observability]
+enabled = true
+
+# 环境变量通过 secrets 设置
+# wrangler secret put FIRECRAWL_API_KEY
+# wrangler secret put OPENROUTER_API_KEY
+# wrangler secret put CF_API_KEY
