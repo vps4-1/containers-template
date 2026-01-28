@@ -1,0 +1,46 @@
+name: Deploy to Cloudflare Container
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build and push Docker image
+        run: |
+          # 构建镜像
+          docker build -t opencode-agent:latest .
+          
+          # 保存镜像为 tar 文件
+          docker save opencode-agent:latest -o opencode-agent.tar
+          
+          echo "Docker image built and saved successfully"
+      
+      - name: Install Wrangler
+        run: npm install -g wrangler
+      
+      - name: Deploy to Cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          # 使用 wrangler 部署
+          wrangler deploy
+      
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: opencode-agent.tar
+          retention-days: 7
