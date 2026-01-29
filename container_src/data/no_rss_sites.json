@@ -1,0 +1,114 @@
+[
+  {
+    "name": "Anthropic News",
+    "url": "https://www.anthropic.com/news",
+    "category": "official",
+    "priority": "high",
+    "description": "Anthropic AI company news and updates"
+  },
+  {
+    "name": "Meta AI Blog",
+    "url": "https://ai.meta.com/blog",
+    "category": "official",
+    "priority": "high",
+    "description": "Meta AI research and Llama model updates"
+  },
+  {
+    "name": "Mistral AI News",
+    "url": "https://mistral.ai/news",
+    "category": "official",
+    "priority": "high",
+    "description": "Mistral AI company news and model releases"
+  },
+  {
+    "name": "Replicate Blog",
+    "url": "https://replicate.com/blog",
+    "category": "official",
+    "priority": "medium",
+    "description": "Replicate AI model hosting platform blog"
+  },
+  {
+    "name": "Perplexity AI Blog",
+    "url": "https://www.perplexity.ai/hub/blog",
+    "category": "official",
+    "priority": "high",
+    "description": "Perplexity AI search engine blog"
+  },
+  {
+    "name": "Cursor Blog",
+    "url": "https://cursor.com/en-US/blog",
+    "category": "official",
+    "priority": "medium",
+    "description": "Anysphere Cursor AI code editor blog"
+  },
+  {
+    "name": "xAI Blog",
+    "url": "https://x.ai/blog",
+    "category": "official",
+    "priority": "high",
+    "description": "Grok and xAI company blog"
+  },
+  {
+    "name": "AMD AI Blogs",
+    "url": "https://www.amd.com/zh-cn/blogs.html",
+    "category": "official",
+    "priority": "medium",
+    "description": "AMD AI hardware and technology blogs"
+  },
+  {
+    "name": "Genspark AI",
+    "url": "https://www.genspark.ai/",
+    "category": "official",
+    "priority": "high",
+    "description": "Genspark AI company website"
+  },
+  {
+    "name": "Manus AI Blog",
+    "url": "https://manus.im/blog",
+    "category": "official",
+    "priority": "medium",
+    "description": "Manus AI blog"
+  },
+  {
+    "name": "Lindy AI Blog",
+    "url": "https://lindy.ai/blog",
+    "category": "official",
+    "priority": "medium",
+    "description": "Lindy AI automation platform blog"
+  },
+  {
+    "name": "Relevance AI Blog",
+    "url": "https://relevance.ai/blog",
+    "category": "official",
+    "priority": "medium",
+    "description": "Relevance AI platform blog"
+  },
+  {
+    "name": "Aisera Blog",
+    "url": "https://aisera.com/blog",
+    "category": "official",
+    "priority": "medium",
+    "description": "Aisera AI automation blog"
+  },
+  {
+    "name": "Moveworks Blog",
+    "url": "https://www.moveworks.com/us/en/resources/blog",
+    "category": "official",
+    "priority": "medium",
+    "description": "Moveworks AI workplace automation blog"
+  },
+  {
+    "name": "Adept Blog",
+    "url": "https://www.adept.ai/blog",
+    "category": "official",
+    "priority": "high",
+    "description": "Adept AI company blog"
+  },
+  {
+    "name": "Simular AI Blog",
+    "url": "https://www.simular.ai/blog",
+    "category": "official",
+    "priority": "medium",
+    "description": "Simular AI blog"
+  }
+]
