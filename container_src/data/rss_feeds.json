@@ -3,60 +3,105 @@
     "name": "OpenAI Blog",
     "url": "https://openai.com/blog/rss.xml",
     "category": "official",
-    "priority": "high"
+    "priority": "high",
+    "website": "https://openai.com/blog"
   },
   {
-    "name": "Anthropic News",
-    "url": "https://www.anthropic.com/news/rss.xml",
+    "name": "Google DeepMind",
+    "url": "https://deepmind.google/blog/rss.xml",
     "category": "official",
-    "priority": "high"
+    "priority": "high",
+    "website": "https://deepmind.google/discover/blog"
+  },
+  {
+    "name": "NVIDIA Blog",
+    "url": "https://blogs.nvidia.com/feed/",
+    "category": "official",
+    "priority": "high",
+    "website": "https://blogs.nvidia.com"
+  },
+  {
+    "name": "NVIDIA Developer Blog",
+    "url": "https://developer.nvidia.com/blog/feed/",
+    "category": "official",
+    "priority": "high",
+    "website": "https://developer.nvidia.com/blog"
+  },
+  {
+    "name": "Hugging Face Blog",
+    "url": "https://huggingface.co/blog/feed.xml",
+    "category": "official",
+    "priority": "high",
+    "website": "https://huggingface.co/blog"
+  },
+  {
+    "name": "Cohere Blog",
+    "url": "https://cohere.com/blog/rss.xml",
+    "category": "official",
+    "priority": "high",
+    "website": "https://cohere.com/blog"
+  },
+  {
+    "name": "Stability AI News",
+    "url": "https://stability.ai/news/rss",
+    "category": "official",
+    "priority": "high",
+    "website": "https://stability.ai/news"
+  },
+  {
+    "name": "EleutherAI Blog",
+    "url": "https://blog.eleuther.ai/rss/",
+    "category": "official",
+    "priority": "high",
+    "website": "https://blog.eleuther.ai"
+  },
+  {
+    "name": "LangChain Blog",
+    "url": "https://blog.langchain.dev/rss/",
+    "category": "official",
+    "priority": "high",
+    "website": "https://blog.langchain.dev"
   },
   {
     "name": "Google AI Blog",
     "url": "https://ai.googleblog.com/feeds/posts/default",
     "category": "official",
-    "priority": "high"
-  },
-  {
-    "name": "DeepMind Blog",
-    "url": "https://deepmind.google/blog/rss.xml",
-    "category": "official",
-    "priority": "high"
-  },
-  {
-    "name": "HuggingFace Blog",
-    "url": "https://huggingface.co/blog/feed.xml",
-    "category": "official",
-    "priority": "high"
+    "priority": "high",
+    "website": "https://ai.googleblog.com"
   },
   {
     "name": "TechCrunch AI",
     "url": "https://techcrunch.com/tag/artificial-intelligence/feed/",
     "category": "news",
-    "priority": "normal"
+    "priority": "normal",
+    "website": "https://techcrunch.com/tag/artificial-intelligence/"
   },
   {
     "name": "The Verge AI",
     "url": "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
     "category": "news",
-    "priority": "normal"
+    "priority": "normal",
+    "website": "https://www.theverge.com/ai-artificial-intelligence"
   },
   {
     "name": "Wired AI",
     "url": "https://www.wired.com/feed/tag/ai/latest/rss",
     "category": "news",
-    "priority": "normal"
+    "priority": "normal",
+    "website": "https://www.wired.com/tag/ai/"
   },
   {
     "name": "MIT Technology Review AI",
     "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
     "category": "research",
-    "priority": "high"
+    "priority": "high",
+    "website": "https://www.technologyreview.com/topic/artificial-intelligence/"
   },
   {
     "name": "arXiv CS.AI",
     "url": "http://export.arxiv.org/rss/cs.AI",
     "category": "research",
-    "priority": "normal"
+    "priority": "normal",
+    "website": "https://arxiv.org/list/cs.AI/recent"
   }
 ]
