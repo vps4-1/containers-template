@@ -371,23 +371,31 @@ app.get("/monitor", (c) => {
 				</div>
 			</div>
 			
-			<!-- 混合抓取测试 -->
+			<!-- 混合抓取与前置过滤统计 -->
 			<div class="card">
-				<h2>🌐 混合抓取测试</h2>
+				<h2>🛡️ 前置过滤统计 (降本)</h2>
 				<div class="info-row">
-					<span class="info-label">L0 (RSS-Bridge)</span>
-					<span class="info-value" id="l0-status">未测试</span>
+					<span class="info-label">总尝试次数</span>
+					<span class="info-value" id="stats-total">0</span>
 				</div>
 				<div class="info-row">
-					<span class="info-label">L1 (自建 Firecrawl)</span>
-					<span class="info-value" id="l1-status">未测试</span>
+					<span class="info-label">URL 规则拦截</span>
+					<span class="info-value status-warning" id="stats-url">0</span>
 				</div>
 				<div class="info-row">
-					<span class="info-label">L2 (托管 Firecrawl)</span>
-					<span class="info-value" id="l2-status">未测试</span>
+					<span class="info-label">元数据预检拦截</span>
+					<span class="info-value status-warning" id="stats-metadata">0</span>
+				</div>
+				<div class="info-row">
+					<span class="info-label">总节省 (拦截数)</span>
+					<span class="info-value status-ok" id="stats-saved">0</span>
+				</div>
+				<div class="info-row">
+					<span class="info-label">通过率</span>
+					<span class="info-value" id="stats-rate">0%</span>
 				</div>
 				<div class="button-group">
-					<button class="btn-primary" onclick="testHybridScraper()">测试混合抓取</button>
+					<button class="btn-primary" onclick="refreshStats()">刷新统计</button>
 				</div>
 			</div>
 			
@@ -504,12 +512,28 @@ app.get("/monitor", (c) => {
 			}
 		}
 		
-		async function testHybridScraper() {
-			addLog('测试混合抓取架构...', 'info');
-			addLog('L0 (RSS-Bridge): 测试中...', 'warning');
-			addLog('L1 (自建 Firecrawl): 测试中...', 'warning');
-			addLog('L2 (托管 Firecrawl): 测试中...', 'warning');
-			// 这里可以调用实际的混合抓取 API
+		async function refreshStats() {
+			addLog('正在获取抓取统计数据...', 'info');
+			try {
+				// 通过调用一个轻量级的 collect 接口来获取统计
+				const response = await fetch('/api/collect', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ sources: [], type: 'auto' })
+				});
+				const data = await response.json();
+				if (data.stats && data.stats.preCheckStats) {
+					const s = data.stats.preCheckStats;
+					document.getElementById('stats-total').textContent = s.totalAttempts;
+					document.getElementById('stats-url').textContent = s.filteredByUrl;
+					document.getElementById('stats-metadata').textContent = s.filteredByMetadata;
+					document.getElementById('stats-saved').textContent = s.totalFiltered;
+					document.getElementById('stats-rate').textContent = s.passedRate;
+					addLog(\`统计数据已更新，已为您节省 \${s.totalFiltered} 次无效抓取\`, 'success');
+				}
+			} catch (error) {
+				addLog(\`获取统计失败: \${error.message}\`, 'error');
+			}
 		}
 		
 		function refreshWorkerStatus() {

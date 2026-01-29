@@ -134,13 +134,30 @@ app.post('/api/collect', async (req, res) => {
       }
     }
 
+    // 获取混合抓取的统计数据
+    const scraperStats = hybridScraper.getStats();
+    
     res.json({
       success: true,
       message: 'Data collection completed',
       sources: results.length,
       totalArticles: allArticles.length,
       results,
-      articles: allArticles
+      articles: allArticles,
+      stats: {
+        preCheckStats: {
+          totalAttempts: scraperStats.totalAttempts,
+          filteredByUrl: scraperStats.filteredByUrl,
+          filteredByMetadata: scraperStats.filteredByMetadata,
+          filteredByIncremental: scraperStats.filteredByIncremental,
+          totalFiltered: scraperStats.filteredByUrl + scraperStats.filteredByMetadata + scraperStats.filteredByIncremental,
+          passedRate: scraperStats.totalAttempts > 0 ? ((scraperStats.totalAttempts - (scraperStats.filteredByUrl + scraperStats.filteredByMetadata + scraperStats.filteredByIncremental)) / scraperStats.totalAttempts * 100).toFixed(2) + '%' : '0%'
+        },
+        scrapingStats: {
+          success: scraperStats.scrapedSuccess,
+          failed: scraperStats.scrapedFailed
+        }
+      }
     });
   } catch (error) {
     console.error('Collection error:', error);
