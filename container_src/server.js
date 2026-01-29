@@ -63,12 +63,43 @@ app.get('/', (req, res) => {
     level: 'container',
     endpoints: {
       health: '/health',
+      stats: '/stats',
+      metrics: '/metrics',
       collect: '/api/collect',
       deduplicate: '/api/deduplicate',
       edit: '/api/edit',
       pipeline: '/api/pipeline'
     }
   });
+});
+
+// 统计数据端点
+app.get('/stats', (req, res) => {
+  try {
+    const stats = firecrawl.getStats();
+    res.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      instanceId: INSTANCE_ID,
+      ...stats
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Prometheus 监控指标端点
+app.get('/metrics', (req, res) => {
+  try {
+    const metrics = firecrawl.getPrometheusMetrics();
+    res.set('Content-Type', 'text/plain; version=0.0.4');
+    res.send(metrics);
+  } catch (error) {
+    res.status(500).send(`# Error generating metrics: ${error.message}`);
+  }
 });
 
 // 数据收集端点
