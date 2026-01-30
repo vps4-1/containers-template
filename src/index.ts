@@ -6,17 +6,20 @@ export class OpenCodeAgentContainer extends Container<Env> {
 	defaultPort = 3000;
 	// 10分钟无活动后休眠
 	sleepAfter = "10m";
-	// 环境变量
-	envVars = {
-		NODE_ENV: "production",
-		FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY || "",
-		OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || "",
-		CF_API_KEY: process.env.CF_API_KEY || "",
-		CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID || "",
-		TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN || "",
-		RSS_BRIDGE_URL: process.env.RSS_BRIDGE_URL || "",
-		SELF_HOSTED_FIRECRAWL_URL: process.env.SELF_HOSTED_FIRECRAWL_URL || "",
-	};
+	
+	// 环境变量从 env binding 动态获取
+	get envVars() {
+		return {
+			NODE_ENV: this.env?.NODE_ENV || "production",
+			FIRECRAWL_API_KEY: this.env?.FIRECRAWL_API_KEY || "",
+			OPENROUTER_API_KEY: this.env?.OPENROUTER_API_KEY || "",
+			CF_API_KEY: this.env?.CF_API_KEY || "",
+			CF_ACCOUNT_ID: this.env?.CF_ACCOUNT_ID || "",
+			TELEGRAM_BOT_TOKEN: this.env?.TELEGRAM_BOT_TOKEN || "",
+			RSS_BRIDGE_URL: this.env?.RSS_BRIDGE_URL || "",
+			SELF_HOSTED_FIRECRAWL_URL: this.env?.SELF_HOSTED_FIRECRAWL_URL || "",
+		};
+	}
 
 	// 生命周期钩子
 	override onStart() {
@@ -562,13 +565,13 @@ app.get("/monitor", (c) => {
 // 环境变量检查端点
 app.get("/api/env-check", (c) => {
 	return c.json({
-		FIRECRAWL_API_KEY: !!process.env.FIRECRAWL_API_KEY,
-		OPENROUTER_API_KEY: !!process.env.OPENROUTER_API_KEY,
-		CF_API_KEY: !!process.env.CF_API_KEY,
-		CF_ACCOUNT_ID: !!process.env.CF_ACCOUNT_ID,
-		TELEGRAM_BOT_TOKEN: !!process.env.TELEGRAM_BOT_TOKEN,
-		RSS_BRIDGE_URL: !!process.env.RSS_BRIDGE_URL,
-		SELF_HOSTED_FIRECRAWL_URL: !!process.env.SELF_HOSTED_FIRECRAWL_URL,
+		FIRECRAWL_API_KEY: !!c.env.FIRECRAWL_API_KEY,
+		OPENROUTER_API_KEY: !!c.env.OPENROUTER_API_KEY,
+		CF_API_KEY: !!c.env.CF_API_KEY,
+		CF_ACCOUNT_ID: !!c.env.CF_ACCOUNT_ID,
+		TELEGRAM_BOT_TOKEN: !!c.env.TELEGRAM_BOT_TOKEN,
+		RSS_BRIDGE_URL: !!c.env.RSS_BRIDGE_URL,
+		SELF_HOSTED_FIRECRAWL_URL: !!c.env.SELF_HOSTED_FIRECRAWL_URL,
 	});
 });
 
